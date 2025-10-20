@@ -1,24 +1,26 @@
-# Étape 1 : Build
+# Build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Copier le fichier .csproj depuis le sous-dossier et restaurer les dépendances
-COPY romerogates_shopping_list/*.csproj ./
+# Copier solution et restaurer
+COPY *.sln ./
+COPY romerogates_shopping_list/*.csproj ./romerogates_shopping_list/
 RUN dotnet restore
 
-# Copier tout le code depuis le sous-dossier
-COPY romerogates_shopping_list/. ./
-RUN dotnet publish -c Release -o out
+# Copier tout le code
+COPY romerogates_shopping_list/. ./romerogates_shopping_list/
+WORKDIR /app/romerogates_shopping_list
 
-# Étape 2 : Runtime
+# Build release
+RUN dotnet publish -c Release -o /app/out
+
+# Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-
-# Copier les fichiers buildés
 COPY --from=build /app/out .
 
-# Exposer le port
+# Port pour Render
+ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 
-# Lancer l’application
 ENTRYPOINT ["dotnet", "romerogates_shopping_list.dll"]
