@@ -19,4 +19,4 @@ COPY --from=build /app/out .
 EXPOSE 80
 
 # Commande pour démarrer l'application
-ENTRYPOINT ["dotnet", "MyApi.dll"]
+ENTRYPOINT ["dotnet", "romerogates_shopping_list.dll"]
